@@ -94,7 +94,7 @@
 
         .nav-buttons {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 0.75rem;
         }
 
@@ -620,6 +620,148 @@
             font-weight: 600;
         }
 
+        .budget-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-200);
+        }
+
+        .budget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .budget-input {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .budget-input input {
+            border: 2px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            padding: 0.5rem;
+            font-size: 0.9rem;
+            width: 100px;
+        }
+
+        .budget-progress {
+            background: var(--gray-200);
+            border-radius: 10px;
+            height: 8px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .budget-progress-bar {
+            height: 100%;
+            background: var(--success);
+            transition: var(--transition);
+        }
+
+        .budget-progress-bar.warning {
+            background: var(--accent);
+        }
+
+        .budget-progress-bar.danger {
+            background: var(--danger);
+        }
+
+        .price-history {
+            background: var(--gray-100);
+            border-radius: var(--border-radius);
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .price-change {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        .price-up {
+            color: var(--danger);
+        }
+
+        .price-down {
+            color: var(--success);
+        }
+
+        .price-same {
+            color: var(--gray-500);
+        }
+
+        .expense-chart {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-200);
+        }
+
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.5rem;
+            height: 120px;
+            margin: 1rem 0;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: var(--primary);
+            border-radius: 4px 4px 0 0;
+            min-height: 4px;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .chart-bar:hover {
+            opacity: 0.8;
+        }
+
+        .chart-label {
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 0.5rem;
+            color: var(--gray-600);
+        }
+
+        .most-expensive {
+            background: var(--accent);
+            color: white;
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+            margin-top: 1rem;
+            font-size: 0.8rem;
+        }
+
+        .alert-banner {
+            background: var(--accent);
+            color: white;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+        }
+
+        .alert-banner.danger {
+            background: var(--danger);
+        }
+
         .shopping-item.checked {
             opacity: 0.6;
         }
@@ -838,6 +980,10 @@
                     <span class="icon">🛒</span>
                     <span>Compras</span>
                 </button>
+                <button class="nav-btn" onclick="showTab('budget')" id="budgetTab">
+                    <span class="icon">💰</span>
+                    <span>Orçamento</span>
+                </button>
                 <button class="nav-btn" onclick="showTab('progress')" id="progressTab">
                     <span class="icon">📊</span>
                     <span>Progresso</span>
@@ -911,6 +1057,45 @@
                 </button>
             </div>
 
+            <!-- Budget Tab -->
+            <div id="budget" class="tab-content">
+                <!-- Meta de Orçamento -->
+                <div class="budget-card">
+                    <div class="budget-header">
+                        <h3>💰 Meta de Orçamento Semanal</h3>
+                    </div>
+                    <div class="budget-input">
+                        <span>Limite:</span>
+                        <input type="number" step="0.01" placeholder="50.00" id="budgetLimit" onchange="updateBudgetLimit(this.value)">
+                        <span>€</span>
+                    </div>
+                    <div class="budget-progress">
+                        <div class="budget-progress-bar" id="budgetProgressBar"></div>
+                    </div>
+                    <div id="budgetStatus"></div>
+                    <div id="budgetAlert"></div>
+                </div>
+
+                <!-- Análise de Gastos -->
+                <div class="expense-chart">
+                    <h3>📊 Gastos por Categoria</h3>
+                    <div class="chart-bars" id="expenseChart"></div>
+                    <div id="mostExpensive"></div>
+                </div>
+
+                <!-- Histórico de Preços -->
+                <div class="budget-card">
+                    <h3>📈 Produtos com Maior Variação de Preço</h3>
+                    <div id="priceHistory"></div>
+                </div>
+
+                <!-- Sugestões de Economia -->
+                <div class="budget-card">
+                    <h3>💡 Sugestões para Economizar</h3>
+                    <div id="savingTips"></div>
+                </div>
+            </div>
+
             <!-- Progress Tab -->
             <div id="progress" class="tab-content">
                 <div class="progress-card">
@@ -941,10 +1126,27 @@
                 <div class="progress-card">
                     <div class="water-tracker">
                         <div class="water-header">
-                            <span class="water-title">💧 Hidratação Diária</span>
-                            <span class="water-goal">Meta: 2.5L</span>
+                            <div>
+                                <span class="water-title">💧 Controlo de Hidratação Diária</span>
+                                <div style="font-size: 0.75rem; color: var(--gray-500); margin-top: 0.25rem;">
+                                    Clique nos copos para marcar quantos já bebeu hoje
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <span class="water-goal">Meta: 2L por dia</span>
+                                <div style="font-size: 0.75rem; color: var(--gray-500);">
+                                    <span id="waterProgress">0L</span> consumidos
+                                </div>
+                            </div>
                         </div>
                         <div class="water-cups" id="waterCups"></div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem; font-size: 0.75rem; color: var(--gray-500);">
+                            <span>Cada copo = 250ml</span>
+                            <button onclick="resetWater()" style="background: var(--gray-200); border: none; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.7rem; cursor: pointer;">
+                                🔄 Reiniciar dia
+                            </button>
+                        </div>
+                        <div id="hydrationTip" style="margin-top: 0.75rem; padding: 0.75rem; background: var(--gray-100); border-radius: 8px; font-size: 0.8rem; color: var(--gray-600);"></div>
                     </div>
                 </div>
             </div>
@@ -1088,6 +1290,8 @@
 
         let currentDay = 'segunda';
         let waterCount = 0;
+        let budgetLimit = 0;
+        let priceHistory = {};
         let mealData = {
             segunda: [], terca: [], quarta: [], quinta: [], sexta: []
         };
@@ -1121,6 +1325,229 @@
             document.getElementById(tabName).classList.add('active');
             document.getElementById(tabName + 'Tab').classList.add('active');
             if (tabName === 'progress') updateProgress();
+            if (tabName === 'budget') updateBudgetAnalysis();
+        }
+
+        function updateBudgetLimit(value) {
+            budgetLimit = parseFloat(value) || 0;
+            updateBudgetAnalysis();
+            saveData();
+        }
+
+        function updateBudgetAnalysis() {
+            loadBudgetData();
+            
+            // Calcular total atual
+            let currentTotal = 0;
+            Object.values(shoppingData).forEach(category => {
+                if (category.items) {
+                    category.items.forEach(item => {
+                        currentTotal += (item.price || 0) * (item.quantity || 1);
+                    });
+                }
+            });
+
+            // Atualizar barra de progresso
+            const progressBar = document.getElementById('budgetProgressBar');
+            const statusDiv = document.getElementById('budgetStatus');
+            const alertDiv = document.getElementById('budgetAlert');
+            
+            if (budgetLimit > 0) {
+                const percentage = (currentTotal / budgetLimit) * 100;
+                progressBar.style.width = Math.min(percentage, 100) + '%';
+                
+                if (percentage < 70) {
+                    progressBar.className = 'budget-progress-bar';
+                } else if (percentage < 90) {
+                    progressBar.className = 'budget-progress-bar warning';
+                } else {
+                    progressBar.className = 'budget-progress-bar danger';
+                }
+                
+                statusDiv.innerHTML = `<strong>€${currentTotal.toFixed(2)}</strong> de €${budgetLimit.toFixed(2)} (${percentage.toFixed(1)}%)`;
+                
+                // Alertas
+                if (percentage >= 100) {
+                    alertDiv.innerHTML = '<div class="alert-banner danger">⚠️ Orçamento ultrapassado! Considere remover alguns itens.</div>';
+                } else if (percentage >= 90) {
+                    alertDiv.innerHTML = '<div class="alert-banner">⚠️ Próximo do limite! Restam €' + (budgetLimit - currentTotal).toFixed(2) + '</div>';
+                } else {
+                    alertDiv.innerHTML = '';
+                }
+            } else {
+                statusDiv.innerHTML = 'Defina um limite de orçamento para acompanhar os gastos';
+                alertDiv.innerHTML = '';
+            }
+
+            updateExpenseChart();
+            updatePriceHistory();
+            updateSavingTips();
+        }
+
+        function updateExpenseChart() {
+            const chartContainer = document.getElementById('expenseChart');
+            const mostExpensiveDiv = document.getElementById('mostExpensive');
+            
+            // Calcular gastos por categoria
+            const categoryExpenses = {};
+            let maxExpense = 0;
+            let mostExpensiveProduct = { name: '', category: '', total: 0 };
+            
+            Object.entries(shoppingData).forEach(([categoryKey, category]) => {
+                let categoryTotal = 0;
+                if (category.items) {
+                    category.items.forEach(item => {
+                        const itemTotal = (item.price || 0) * (item.quantity || 1);
+                        categoryTotal += itemTotal;
+                        
+                        if (itemTotal > mostExpensiveProduct.total) {
+                            mostExpensiveProduct = {
+                                name: item.name,
+                                category: category.name,
+                                total: itemTotal
+                            };
+                        }
+                    });
+                }
+                categoryExpenses[category.name] = categoryTotal;
+                maxExpense = Math.max(maxExpense, categoryTotal);
+            });
+            
+            // Criar barras do gráfico
+            let chartHTML = '';
+            Object.entries(categoryExpenses).forEach(([categoryName, expense]) => {
+                const height = maxExpense > 0 ? (expense / maxExpense) * 100 : 0;
+                chartHTML += `
+                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                        <div class="chart-bar" style="height: ${height}%" title="€${expense.toFixed(2)}"></div>
+                        <div class="chart-label">${categoryName}</div>
+                        <div class="chart-label">€${expense.toFixed(2)}</div>
+                    </div>
+                `;
+            });
+            
+            chartContainer.innerHTML = chartHTML;
+            
+            // Produto mais caro
+            if (mostExpensiveProduct.total > 0) {
+                mostExpensiveDiv.innerHTML = `
+                    <div class="most-expensive">
+                        💰 Produto mais caro: <strong>${mostExpensiveProduct.name}</strong> 
+                        (${mostExpensiveProduct.category}) - €${mostExpensiveProduct.total.toFixed(2)}
+                    </div>
+                `;
+            }
+        }
+
+        function updatePriceHistory() {
+            const historyDiv = document.getElementById('priceHistory');
+            
+            let historyHTML = '';
+            const productsWithHistory = Object.entries(priceHistory).filter(([key, history]) => history.length > 0);
+            
+            if (productsWithHistory.length === 0) {
+                historyHTML = '<p class="empty-state">Ainda não há histórico de preços. Altere preços dos produtos para começar a acompanhar.</p>';
+            } else {
+                productsWithHistory.slice(0, 5).forEach(([productKey, history]) => {
+                    const productName = productKey.split('_').slice(1).join('_');
+                    const lastPrice = history[history.length - 1];
+                    const currentItem = findProductByKey(productKey);
+                    
+                    if (currentItem) {
+                        const priceChange = currentItem.price - lastPrice.price;
+                        const changePercent = ((priceChange / lastPrice.price) * 100).toFixed(1);
+                        
+                        let changeClass = 'price-same';
+                        let changeIcon = '➡️';
+                        if (priceChange > 0) {
+                            changeClass = 'price-up';
+                            changeIcon = '📈';
+                        } else if (priceChange < 0) {
+                            changeClass = 'price-down';
+                            changeIcon = '📉';
+                        }
+                        
+                        historyHTML += `
+                            <div class="price-history">
+                                <strong>${productName}</strong>
+                                <div class="price-change ${changeClass}">
+                                    ${changeIcon} €${lastPrice.price.toFixed(2)} → €${currentItem.price.toFixed(2)} 
+                                    (${priceChange >= 0 ? '+' : ''}${changePercent}%)
+                                </div>
+                                <small>Última alteração: ${lastPrice.date}</small>
+                            </div>
+                        `;
+                    }
+                });
+            }
+            
+            historyDiv.innerHTML = historyHTML;
+        }
+
+        function findProductByKey(productKey) {
+            const [categoryKey, ...nameParts] = productKey.split('_');
+            const productName = nameParts.join('_');
+            
+            if (shoppingData[categoryKey] && shoppingData[categoryKey].items) {
+                return shoppingData[categoryKey].items.find(item => item.name === productName);
+            }
+            return null;
+        }
+
+        function updateSavingTips() {
+            const tipsDiv = document.getElementById('savingTips');
+            const tips = [];
+            
+            // Analisar dados para gerar dicas
+            let totalExpense = 0;
+            let itemCount = 0;
+            let mostExpensiveCategories = [];
+            
+            Object.entries(shoppingData).forEach(([categoryKey, category]) => {
+                let categoryTotal = 0;
+                if (category.items) {
+                    category.items.forEach(item => {
+                        const itemTotal = (item.price || 0) * (item.quantity || 1);
+                        categoryTotal += itemTotal;
+                        totalExpense += itemTotal;
+                        itemCount++;
+                    });
+                }
+                mostExpensiveCategories.push({ name: category.name, total: categoryTotal });
+            });
+            
+            mostExpensiveCategories.sort((a, b) => b.total - a.total);
+            
+            // Gerar dicas baseadas nos dados
+            if (budgetLimit > 0 && totalExpense > budgetLimit * 0.9) {
+                tips.push('⚠️ Está próximo do limite de orçamento. Considere reduzir quantidades ou remover itens não essenciais.');
+            }
+            
+            if (mostExpensiveCategories.length > 0 && mostExpensiveCategories[0].total > totalExpense * 0.4) {
+                tips.push(`💡 A categoria "${mostExpensiveCategories[0].name}" representa uma grande parte do orçamento. Procure alternativas mais económicas.`);
+            }
+            
+            if (itemCount > 20) {
+                tips.push('📝 Lista muito extensa. Foque nos itens essenciais para esta semana.');
+            }
+            
+            tips.push('🏪 Compare preços entre diferentes lojas para economizar.');
+            tips.push('📅 Planear refeições ajuda a evitar compras desnecessárias.');
+            tips.push('🥫 Produtos da marca branca costumam ser mais económicos.');
+            
+            let tipsHTML = '';
+            tips.slice(0, 4).forEach(tip => {
+                tipsHTML += `<div style="margin-bottom: 0.5rem; padding: 0.5rem; background: var(--gray-100); border-radius: 8px;">${tip}</div>`;
+            });
+            
+            tipsDiv.innerHTML = tipsHTML;
+        }
+
+        function loadBudgetData() {
+            const budgetInput = document.getElementById('budgetLimit');
+            if (budgetInput && budgetLimit > 0) {
+                budgetInput.value = budgetLimit.toFixed(2);
+            }
         }
 
         function selectDay(day) {
@@ -1382,8 +1809,32 @@
 
         function updateShoppingItemPrice(categoryKey, itemIndex, newPrice) {
             if (shoppingData[categoryKey] && shoppingData[categoryKey].items[itemIndex]) {
-                shoppingData[categoryKey].items[itemIndex].price = parseFloat(newPrice) || 0;
+                const item = shoppingData[categoryKey].items[itemIndex];
+                const oldPrice = item.price || 0;
+                const price = parseFloat(newPrice) || 0;
+                
+                // Guardar histórico de preços
+                const productKey = `${categoryKey}_${item.name}`;
+                if (!priceHistory[productKey]) {
+                    priceHistory[productKey] = [];
+                }
+                
+                if (oldPrice !== price && oldPrice > 0) {
+                    priceHistory[productKey].push({
+                        date: new Date().toLocaleDateString('pt-PT'),
+                        price: oldPrice,
+                        store: item.store
+                    });
+                    
+                    // Manter apenas últimas 10 entradas
+                    if (priceHistory[productKey].length > 10) {
+                        priceHistory[productKey] = priceHistory[productKey].slice(-10);
+                    }
+                }
+                
+                item.price = price;
                 updateShoppingStats();
+                updateBudgetAnalysis();
                 saveData();
             }
         }
@@ -1451,9 +1902,51 @@
             for (let i = 0; i < 8; i++) {
                 const cup = document.createElement('div');
                 cup.className = `water-cup ${i < waterCount ? 'filled' : ''}`;
-                cup.innerHTML = i < waterCount ? '💧' : '';
+                cup.innerHTML = i < waterCount ? '💧' : '🥤';
                 cup.onclick = () => setWaterCount(i + 1);
+                cup.title = `Copo ${i + 1} (${(i + 1) * 250}ml)`;
                 container.appendChild(cup);
+            }
+
+            // Atualizar contador de progresso
+            const progressElement = document.getElementById('waterProgress');
+            if (progressElement) {
+                const liters = (waterCount * 0.25).toFixed(1);
+                progressElement.textContent = `${liters}L`;
+            }
+
+            // Atualizar dica de hidratação
+            updateHydrationTip();
+        }
+
+        function updateHydrationTip() {
+            const tipElement = document.getElementById('hydrationTip');
+            if (!tipElement) return;
+
+            const liters = waterCount * 0.25;
+            let tip = '';
+
+            if (waterCount === 0) {
+                tip = '💡 Comece o dia bebendo um copo de água! A hidratação é essencial para manter energia e concentração.';
+            } else if (waterCount < 4) {
+                tip = '👍 Bom começo! Continue bebendo água regularmente ao longo do dia.';
+            } else if (waterCount < 6) {
+                tip = '⭐ Está no bom caminho! Já bebeu mais de metade da quantidade recomendada.';
+            } else if (waterCount < 8) {
+                tip = '🔥 Excelente! Está quase a atingir a meta diária de hidratação.';
+            } else {
+                tip = '🎉 Parabéns! Atingiu a meta de hidratação diária. O seu corpo agradece!';
+            }
+
+            tipElement.innerHTML = tip;
+        }
+
+        function resetWater() {
+            if (confirm('Reiniciar contador de água para hoje?')) {
+                waterCount = 0;
+                loadWaterTracker();
+                saveData();
+                showNotification('Contador de hidratação reiniciado!');
             }
         }
 
@@ -1461,8 +1954,14 @@
             waterCount = count;
             loadWaterTracker();
             saveData();
+            
+            const liters = count * 0.25;
             if (count === 8) {
-                showNotification('Parabéns! Meta de hidratação alcançada!');
+                showNotification('Parabéns! Meta de hidratação diária alcançada! 🎉');
+            } else if (count === 4) {
+                showNotification(`Já bebeu ${liters}L! Está a meio caminho da meta! 💪`);
+            } else if (count === 1) {
+                showNotification('Primeiro copo do dia registado! Continue assim! 💧');
             }
         }
 
