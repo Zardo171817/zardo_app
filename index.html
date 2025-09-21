@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zardo App</title>
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Zardo App">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="description" content="Alimentação Inteligente & Personalizada">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" id="manifest-placeholder">
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🍽️%3C/text%3E%3C/svg%3E">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --success: #22c55e;
+            --dark: #1f2937;
+            --white: #ffffff;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+        }
+
+        .app-container {
+            max-width: 430px;
+            margin: 0 auto;
+            background: var(--white);
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 2rem 1.5rem 1.5rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .date-display {
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            margin-top: 1rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .nav {
+            background: var(--white);
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+        }
+
+        .nav-btn {
+            background: var(--gray-100);
+            border: none;
+            padding: 1rem 0.5rem;
+            border-radius: var(--border-radius);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn .icon {
+            font-size: 1.5rem;
+        }
+
+        .content {
+            padding: 1.5rem;
+            padding-bottom: 2rem;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--gray-500);
+        }
+
+        .empty-state .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .day-selector {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-200);
+        }
+
+        .day-selector h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+        }
+
+        .day-btn {
+            background: var(--gray-100);
+            border: none;
+            padding: 1rem 0.5rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: var(--gray-600);
+        }
+
+        .day-btn.active {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .day-btn:hover:not(.active) {
+            background: var(--gray-200);
+        }
+
+        .day-name {
+            display: block;
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        .day-number {
+            display: block;
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-top: 0.25rem;
+        }
+
+        .meal-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-200);
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .meal-header {
+            background: var(--secondary);
+            color: white;
+            padding: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .meal-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex: 1;
+        }
+
+        .meal-title input {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 0.5rem;
+            border-radius: 8px;
+            flex: 1;
+            margin-left: 0.5rem;
+        }
+
+        .meal-time {
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .meal-time input {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+            width: 60px;
+        }
+
+        .meal-content {
+            padding: 1.5rem;
+        }
+
+        .meal-items {
+            list-style: none;
+            margin-bottom: 1rem;
+        }
+
+        .meal-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .meal-item:last-child {
+            border-bottom: none;
+        }
+
+        .meal-item-icon {
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .meal-item-text {
+            flex: 1;
+        }
+
+        .meal-item-text input {
+            background: none;
+            border: none;
+            font-size: 0.9rem;
+            color: var(--gray-700);
+            font-weight: 500;
+            width: 100%;
+            padding: 0.25rem;
+        }
+
+        .meal-item-text input:focus {
+            outline: 2px solid var(--primary);
+            background: var(--gray-100);
+            border-radius: 4px;
+        }
+
+        .btn-small {
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            color: var(--gray-500);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .btn-small:hover {
+            background: var(--gray-100);
+            color: var(--danger);
+        }
+
+        .add-item-container {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .add-item-input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            font-size: 0.9rem;
+        }
+
+        .add-item-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .add-item-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .add-item-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .meal-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: var(--transition);
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .add-meal-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 1.25rem;
+            border-radius: var(--border-radius);
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .add-meal-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .shopping-summary {
+            background: var(--success);
+            color: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .total-price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .price-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .shopping-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        .category-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-200);
+            overflow: hidden;
+        }
+
+        .category-header {
+            background: var(--accent);
+            color: white;
+            padding: 1rem 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .category-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1rem;
+            flex: 1;
+        }
+
+        .category-title input {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 1rem;
+            font-weight: 700;
+            padding: 0.5rem;
+            border-radius: 8px;
+            flex: 1;
+            margin-left: 0.5rem;
+        }
+
+        .category-count {
+            background: rgba(255,255,255,0.2);
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+
+        .category-items {
+            padding: 1rem 1.5rem;
+        }
+
+        .shopping-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .shopping-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--gray-500);
+            border-radius: 6px;
+            margin-right: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .item-checkbox.checked {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .item-checkbox.checked::after {
+            content: "✓";
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .item-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .item-name input {
+            background: none;
+            border: none;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.9rem;
+            width: 100%;
+            padding: 0.25rem;
+        }
+
+        .item-store select {
+            background: none;
+            border: none;
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            cursor: pointer;
+        }
+
+        .item-price input {
+            background: none;
+            border: none;
+            font-weight: 700;
+            color: var(--success);
+            font-size: 0.9rem;
+            width: 60px;
+            text-align: right;
+        }
+
+        .shopping-item.checked {
+            opacity: 0.6;
+        }
+
+        .shopping-item.checked .item-name input {
+            text-decoration: line-through;
+        }
+
+        .add-category-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+
+        .add-category-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .progress-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-200);
+        }
+
+        .progress-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-card {
+            background: var(--gray-100);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--gray-600);
+            font-weight: 600;
+        }
+
+        .water-tracker {
+            margin-top: 1.5rem;
+        }
+
+        .water-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .water-title {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .water-goal {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+        }
+
+        .water-cups {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 0.5rem;
+        }
+
+        .water-cup {
+            aspect-ratio: 1;
+            background: var(--gray-200);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .water-cup.filled {
+            background: #06b6d4;
+            color: white;
+        }
+
+        .water-cup:hover:not(.filled) {
+            background: var(--gray-500);
+        }
+
+        .tip-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--accent);
+            transition: var(--transition);
+        }
+
+        .tip-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .tip-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .tip-icon {
+            font-size: 1.5rem;
+        }
+
+        .tip-title {
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 1rem;
+        }
+
+        .tip-content {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .notification {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            z-index: 1001;
+            font-weight: 600;
+            max-width: 90%;
+        }
+
+        .notification.error {
+            background: var(--danger);
+        }
+
+        @media (max-width: 430px) {
+            .app-container {
+                max-width: 100%;
+            }
+            .content {
+                padding: 1rem;
+            }
+            .days-grid {
+                gap: 0.25rem;
+            }
+            .day-btn {
+                padding: 0.75rem 0.25rem;
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>🍽️ Zardo App</h1>
+            <p>Alimentação Inteligente & Personalizada</p>
+            <div class="date-display" id="currentDate"></div>
+        </div>
+
+        <div class="nav">
+            <div class="nav-buttons">
+                <button class="nav-btn active" onclick="showTab('menu')" id="menuTab">
+                    <span class="icon">📅</span>
+                    <span>Menu</span>
+                </button>
+                <button class="nav-btn" onclick="showTab('shopping')" id="shoppingTab">
+                    <span class="icon">🛒</span>
+                    <span>Compras</span>
+                </button>
+                <button class="nav-btn" onclick="showTab('progress')" id="progressTab">
+                    <span class="icon">📊</span>
+                    <span>Progresso</span>
+                </button>
+                <button class="nav-btn" onclick="showTab('tips')" id="tipsTab">
+                    <span class="icon">💡</span>
+                    <span>Dicas</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Menu Tab -->
+            <div id="menu" class="tab-content active">
+                <div class="day-selector">
+                    <h3>📅 Seleciona o Dia para Editar</h3>
+                    <div class="days-grid">
+                        <button class="day-btn active" onclick="selectDay('segunda')" id="day-segunda">
+                            <span class="day-name">SEG</span>
+                            <span class="day-number">23</span>
+                        </button>
+                        <button class="day-btn" onclick="selectDay('terca')" id="day-terca">
+                            <span class="day-name">TER</span>
+                            <span class="day-number">24</span>
+                        </button>
+                        <button class="day-btn" onclick="selectDay('quarta')" id="day-quarta">
+                            <span class="day-name">QUA</span>
+                            <span class="day-number">25</span>
+                        </button>
+                        <button class="day-btn" onclick="selectDay('quinta')" id="day-quinta">
+                            <span class="day-name">QUI</span>
+                            <span class="day-number">26</span>
+                        </button>
+                        <button class="day-btn" onclick="selectDay('sexta')" id="day-sexta">
+                            <span class="day-name">SEX</span>
+                            <span class="day-number">27</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="meal-container" id="mealsContainer"></div>
+
+                <button class="add-meal-btn" onclick="addNewMeal()">
+                    <span>➕</span>
+                    <span>Adicionar Nova Refeição</span>
+                </button>
+            </div>
+
+            <!-- Shopping Tab -->
+            <div id="shopping" class="tab-content">
+                <div class="shopping-summary">
+                    <div class="total-price" id="totalPrice">€0.00</div>
+                    <div class="price-subtitle">Orçamento Semanal Total</div>
+                    <div class="shopping-stats">
+                        <div class="stat-item">
+                            <span class="stat-number" id="totalItems">0</span>
+                            <span class="stat-label">Itens</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="checkedItems">0</span>
+                            <span class="stat-label">Comprados</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="shoppingCategories"></div>
+
+                <button class="add-category-btn" onclick="addNewCategory()">
+                    <span>➕</span>
+                    <span>Adicionar Nova Categoria</span>
+                </button>
+            </div>
+
+            <!-- Progress Tab -->
+            <div id="progress" class="tab-content">
+                <div class="progress-card">
+                    <div class="progress-title">
+                        <span>📊</span>
+                        <span>Estatísticas Semanais</span>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-value" id="totalMeals">0</span>
+                            <span class="stat-label">Refeições criadas</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value" id="totalBudget">€0</span>
+                            <span class="stat-label">Orçamento total</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value" id="categoriesCount">0</span>
+                            <span class="stat-label">Categorias</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value" id="avgMealPrice">€0</span>
+                            <span class="stat-label">Custo médio/dia</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="progress-card">
+                    <div class="water-tracker">
+                        <div class="water-header">
+                            <span class="water-title">💧 Hidratação Diária</span>
+                            <span class="water-goal">Meta: 2.5L</span>
+                        </div>
+                        <div class="water-cups" id="waterCups"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tips Tab -->
+            <div id="tips" class="tab-content">
+                <div class="tip-card">
+                    <div class="tip-header">
+                        <span class="tip-icon">✏️</span>
+                        <span class="tip-title">Como Usar o Editor</span>
+                    </div>
+                    <div class="tip-content">
+                        Clica em qualquer texto para editar! Podes alterar nomes de refeições, horários, ingredientes e preços. Tudo é guardado automaticamente.
+                    </div>
+                </div>
+
+                <div class="tip-card">
+                    <div class="tip-header">
+                        <span class="tip-icon">📅</span>
+                        <span class="tip-title">Planeamento Semanal</span>
+                    </div>
+                    <div class="tip-content">
+                        Cria o teu menu para cada dia da semana. Adiciona refeições personalizadas e ajusta conforme os teus horários.
+                    </div>
+                </div>
+
+                <div class="tip-card">
+                    <div class="tip-header">
+                        <span class="tip-icon">🛒</span>
+                        <span class="tip-title">Lista de Compras</span>
+                    </div>
+                    <div class="tip-content">
+                        Cria as tuas próprias categorias e adiciona produtos com preços atuais. Marca como comprado quando fizeres as compras.
+                    </div>
+                </div>
+
+                <div class="tip-card">
+                    <div class="tip-header">
+                        <span class="tip-icon">💰</span>
+                        <span class="tip-title">Controlo de Orçamento</span>
+                    </div>
+                    <div class="tip-content">
+                        Atualiza os preços semanalmente para teres um orçamento preciso e controlar melhor os gastos.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create and inject manifest
+        const manifest = {
+            "name": "Zardo App - Alimentação Inteligente",
+            "short_name": "Zardo App",
+            "description": "Alimentação Inteligente & Personalizada",
+            "start_url": "./",
+            "display": "standalone",
+            "background_color": "#667eea",
+            "theme_color": "#2563eb",
+            "orientation": "portrait",
+            "scope": "./",
+            "lang": "pt",
+            "categories": ["food", "health", "lifestyle"],
+            "icons": [
+                {
+                    "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23667eea'/%3E%3Cstop offset='100%25' style='stop-color:%23764ba2'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='192' height='192' rx='24' fill='url(%23grad)'/%3E%3Ctext x='96' y='120' font-family='system-ui' font-size='80' text-anchor='middle' fill='white'%3E🍽️%3C/text%3E%3C/svg%3E",
+                    "sizes": "192x192",
+                    "type": "image/svg+xml"
+                },
+                {
+                    "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23667eea'/%3E%3Cstop offset='100%25' style='stop-color:%23764ba2'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='64' fill='url(%23grad)'/%3E%3Ctext x='256' y='320' font-family='system-ui' font-size='200' text-anchor='middle' fill='white'%3E🍽️%3C/text%3E%3C/svg%3E",
+                    "sizes": "512x512",
+                    "type": "image/svg+xml"
+                }
+            ]
+        };
+
+        // Inject manifest
+        const manifestBlob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+        const manifestURL = URL.createObjectURL(manifestBlob);
+        document.getElementById('manifest-placeholder').href = manifestURL;
+
+        // Service Worker
+        const serviceWorkerCode = `
+            const CACHE_NAME = 'zardo-app-v1';
+            const urlsToCache = [
+                '/',
+                '/index.html'
+            ];
+
+            self.addEventListener('install', function(event) {
+                event.waitUntil(
+                    caches.open(CACHE_NAME)
+                        .then(function(cache) {
+                            return cache.addAll(urlsToCache);
+                        })
+                );
+            });
+
+            self.addEventListener('fetch', function(event) {
+                event.respondWith(
+                    caches.match(event.request)
+                        .then(function(response) {
+                            if (response) {
+                                return response;
+                            }
+                            return fetch(event.request);
+                        })
+                );
+            });
+
+            self.addEventListener('activate', function(event) {
+                event.waitUntil(
+                    caches.keys().then(function(cacheNames) {
+                        return Promise.all(
+                            cacheNames.map(function(cacheName) {
+                                if (cacheName !== CACHE_NAME) {
+                                    return caches.delete(cacheName);
+                                }
+                            })
+                        );
+                    })
+                );
+            });
+        `;
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                const swBlob = new Blob([serviceWorkerCode], {type: 'application/javascript'});
+                const swURL = URL.createObjectURL(swBlob);
+                
+                navigator.serviceWorker.register(swURL)
+                    .then(function(registration) {
+                        console.log('SW registado com sucesso:', registration.scope);
+                    }, function(err) {
+                        console.log('SW falhou ao registar:', err);
+                    });
+            });
+        }
+
+        let currentDay = 'segunda';
+        let waterCount = 0;
+        let mealData = {
+            segunda: [], terca: [], quarta: [], quinta: [], sexta: []
+        };
+        let shoppingData = {};
+
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCurrentDate();
+            loadSavedData();
+            loadMeals();
+            loadShoppingList();
+            loadWaterTracker();
+            updateProgress();
+            
+            const isFirstTime = !localStorage.getItem('zardo_meals') && !localStorage.getItem('zardo_shopping');
+            if (isFirstTime) {
+                setTimeout(() => {
+                    showNotification('Bem-vindo ao Zardo App! Cria o teu plano alimentar personalizado.');
+                }, 1000);
+            }
+        });
+
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('pt-PT', options);
+        }
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            if (tabName === 'progress') updateProgress();
+        }
+
+        function selectDay(day) {
+            currentDay = day;
+            document.querySelectorAll('.day-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('day-' + day).classList.add('active');
+            loadMeals();
+        }
+
+        function loadMeals() {
+            const container = document.getElementById('mealsContainer');
+            const meals = mealData[currentDay] || [];
+            
+            if (meals.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="icon">🍽️</div><h3>Nenhuma refeição criada</h3><p>Adiciona a primeira refeição para este dia</p></div>';
+                return;
+            }
+            
+            container.innerHTML = meals.map((meal, mealIndex) => `
+                <div class="meal-card">
+                    <div class="meal-header">
+                        <div class="meal-title">
+                            <span onclick="changeMealIcon(${mealIndex})" style="cursor: pointer;" title="Clica para mudar ícone">${meal.icon}</span>
+                            <input type="text" value="${meal.name}" onchange="updateMealName(${mealIndex}, this.value)" placeholder="Nome da refeição">
+                        </div>
+                        <div class="meal-time">
+                            <input type="time" value="${meal.time}" onchange="updateMealTime(${mealIndex}, this.value)">
+                        </div>
+                    </div>
+                    <div class="meal-content">
+                        <ul class="meal-items">
+                            ${meal.items.map((item, itemIndex) => `
+                                <li class="meal-item">
+                                    <span class="meal-item-icon">🍽️</span>
+                                    <div class="meal-item-text">
+                                        <input type="text" value="${item}" onchange="updateMealItem(${mealIndex}, ${itemIndex}, this.value)" placeholder="Ingrediente">
+                                    </div>
+                                    <button class="btn-small" onclick="deleteMealItem(${mealIndex}, ${itemIndex})" title="Eliminar">🗑️</button>
+                                </li>
+                            `).join('')}
+                        </ul>
+                        <div class="add-item-container">
+                            <input type="text" class="add-item-input" placeholder="Adicionar ingrediente..." id="newItem-${mealIndex}" onkeypress="handleAddItemKeypress(event, ${mealIndex})">
+                            <button class="add-item-btn" onclick="addMealItem(${mealIndex})">➕</button>
+                        </div>
+                        <div class="meal-actions">
+                            <button class="btn-danger" onclick="deleteMeal(${mealIndex})">🗑️ Eliminar Refeição</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addNewMeal() {
+            const newMeal = { id: Date.now(), name: "Nova Refeição", time: "12:00", icon: "🍽️", items: [] };
+            if (!mealData[currentDay]) mealData[currentDay] = [];
+            mealData[currentDay].push(newMeal);
+            loadMeals();
+            saveData();
+            showNotification('Nova refeição adicionada!');
+        }
+
+        function updateMealName(mealIndex, newName) {
+            if (mealData[currentDay][mealIndex]) {
+                mealData[currentDay][mealIndex].name = newName;
+                saveData();
+            }
+        }
+
+        function updateMealTime(mealIndex, newTime) {
+            if (mealData[currentDay][mealIndex]) {
+                mealData[currentDay][mealIndex].time = newTime;
+                saveData();
+            }
+        }
+
+        function changeMealIcon(mealIndex) {
+            const icons = ['🍽️', '☀️', '🍎', '🥗', '⚡', '🌙', '🥐', '🍖', '🥛', '🍓'];
+            const currentIcon = mealData[currentDay][mealIndex].icon;
+            const currentIndex = icons.indexOf(currentIcon);
+            const nextIndex = (currentIndex + 1) % icons.length;
+            mealData[currentDay][mealIndex].icon = icons[nextIndex];
+            loadMeals();
+            saveData();
+        }
+
+        function addMealItem(mealIndex) {
+            const input = document.getElementById(`newItem-${mealIndex}`);
+            const newItem = input.value.trim();
+            if (newItem) {
+                if (!mealData[currentDay][mealIndex].items) mealData[currentDay][mealIndex].items = [];
+                mealData[currentDay][mealIndex].items.push(newItem);
+                input.value = '';
+                loadMeals();
+                saveData();
+            }
+        }
+
+        function handleAddItemKeypress(event, mealIndex) {
+            if (event.key === 'Enter') addMealItem(mealIndex);
+        }
+
+        function updateMealItem(mealIndex, itemIndex, newValue) {
+            if (mealData[currentDay][mealIndex] && mealData[currentDay][mealIndex].items[itemIndex] !== undefined) {
+                mealData[currentDay][mealIndex].items[itemIndex] = newValue;
+                saveData();
+            }
+        }
+
+        function deleteMealItem(mealIndex, itemIndex) {
+            if (confirm('Eliminar este ingrediente?')) {
+                mealData[currentDay][mealIndex].items.splice(itemIndex, 1);
+                loadMeals();
+                saveData();
+                showNotification('Ingrediente eliminado!');
+            }
+        }
+
+        function deleteMeal(mealIndex) {
+            if (confirm('Eliminar esta refeição completa?')) {
+                mealData[currentDay].splice(mealIndex, 1);
+                loadMeals();
+                saveData();
+                showNotification('Refeição eliminada!');
+            }
+        }
+
+        function loadShoppingList() {
+            const container = document.getElementById('shoppingCategories');
+            const categories = Object.keys(shoppingData);
+            
+            if (categories.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="icon">🛒</div><h3>Lista de compras vazia</h3><p>Adiciona a primeira categoria de produtos</p></div>';
+                updateShoppingStats();
+                return;
+            }
+            
+            container.innerHTML = categories.map(categoryKey => {
+                const category = shoppingData[categoryKey];
+                const checkedCount = category.items.filter(item => item.checked).length;
+                
+                return `
+                    <div class="category-card">
+                        <div class="category-header">
+                            <div class="category-title">
+                                <span onclick="changeCategoryIcon('${categoryKey}')" style="cursor: pointer;" title="Clica para mudar ícone">${category.icon}</span>
+                                <input type="text" value="${category.name}" onchange="updateCategoryName('${categoryKey}', this.value)" placeholder="Nome da categoria">
+                            </div>
+                            <div class="category-count">${checkedCount}/${category.items.length}</div>
+                        </div>
+                        <div class="category-items">
+                            ${category.items.map((item, itemIndex) => `
+                                <div class="shopping-item ${item.checked ? 'checked' : ''}">
+                                    <div class="item-checkbox ${item.checked ? 'checked' : ''}" onclick="toggleShoppingItem('${categoryKey}', ${itemIndex})"></div>
+                                    <div class="item-details">
+                                        <div class="item-name">
+                                            <input type="text" value="${item.name}" onchange="updateShoppingItemName('${categoryKey}', ${itemIndex}, this.value)" placeholder="Nome do produto">
+                                        </div>
+                                        <div class="item-store">
+                                            <select onchange="updateShoppingItemStore('${categoryKey}', ${itemIndex}, this.value)">
+                                                <option value="auchan" ${item.store === 'auchan' ? 'selected' : ''}>🏪 Auchan</option>
+                                                <option value="mercadona" ${item.store === 'mercadona' ? 'selected' : ''}>🛍️ Mercadona</option>
+                                                <option value="continente" ${item.store === 'continente' ? 'selected' : ''}>🛒 Continente</option>
+                                                <option value="lidl" ${item.store === 'lidl' ? 'selected' : ''}>🏬 Lidl</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="item-price">
+                                        €<input type="number" step="0.01" value="${item.price.toFixed(2)}" onchange="updateShoppingItemPrice('${categoryKey}', ${itemIndex}, this.value)">
+                                    </div>
+                                    <button class="btn-small" onclick="deleteShoppingItem('${categoryKey}', ${itemIndex})" title="Eliminar">🗑️</button>
+                                </div>
+                            `).join('')}
+                            <div class="add-item-container">
+                                <input type="text" class="add-item-input" placeholder="Adicionar produto..." id="newShoppingItem-${categoryKey}" onkeypress="handleAddShoppingItemKeypress(event, '${categoryKey}')">
+                                <button class="add-item-btn" onclick="addShoppingItem('${categoryKey}')">➕</button>
+                            </div>
+                            <div style="text-align: right; margin-top: 1rem;">
+                                <button class="btn-danger" onclick="deleteCategory('${categoryKey}')">🗑️ Eliminar Categoria</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            updateShoppingStats();
+        }
+
+        function addNewCategory() {
+            const categoryName = prompt('Nome da nova categoria:');
+            if (categoryName && categoryName.trim()) {
+                const categoryKey = categoryName.toLowerCase().replace(/\s+/g, '');
+                shoppingData[categoryKey] = { name: categoryName.trim(), icon: '🛍️', items: [] };
+                loadShoppingList();
+                saveData();
+                showNotification('Nova categoria adicionada!');
+            }
+        }
+
+        function updateCategoryName(categoryKey, newName) {
+            if (shoppingData[categoryKey]) {
+                shoppingData[categoryKey].name = newName;
+                saveData();
+            }
+        }
+
+        function changeCategoryIcon(categoryKey) {
+            const icons = ['🛍️', '🍎', '🥩', '🥛', '🍞', '🥶', '🧴', '🧽', '🍯', '🥜'];
+            const currentIcon = shoppingData[categoryKey].icon;
+            const currentIndex = icons.indexOf(currentIcon);
+            const nextIndex = (currentIndex + 1) % icons.length;
+            shoppingData[categoryKey].icon = icons[nextIndex];
+            loadShoppingList();
+            saveData();
+        }
+
+        function addShoppingItem(categoryKey) {
+            const input = document.getElementById(`newShoppingItem-${categoryKey}`);
+            const newItem = input.value.trim();
+            if (newItem) {
+                const item = { name: newItem, price: 0.00, store: 'auchan', checked: false };
+                if (!shoppingData[categoryKey].items) shoppingData[categoryKey].items = [];
+                shoppingData[categoryKey].items.push(item);
+                input.value = '';
+                loadShoppingList();
+                saveData();
+            }
+        }
+
+        function handleAddShoppingItemKeypress(event, categoryKey) {
+            if (event.key === 'Enter') addShoppingItem(categoryKey);
+        }
+
+        function updateShoppingItemName(categoryKey, itemIndex, newName) {
+            if (shoppingData[categoryKey] && shoppingData[categoryKey].items[itemIndex]) {
+                shoppingData[categoryKey].items[itemIndex].name = newName;
+                saveData();
+            }
+        }
+
+        function updateShoppingItemPrice(categoryKey, itemIndex, newPrice) {
+            if (shoppingData[categoryKey] && shoppingData[categoryKey].items[itemIndex]) {
+                shoppingData[categoryKey].items[itemIndex].price = parseFloat(newPrice) || 0;
+                updateShoppingStats();
+                saveData();
+            }
+        }
+
+        function updateShoppingItemStore(categoryKey, itemIndex, newStore) {
+            if (shoppingData[categoryKey] && shoppingData[categoryKey].items[itemIndex]) {
+                shoppingData[categoryKey].items[itemIndex].store = newStore;
+                saveData();
+            }
+        }
+
+        function toggleShoppingItem(categoryKey, itemIndex) {
+            if (shoppingData[categoryKey] && shoppingData[categoryKey].items[itemIndex]) {
+                shoppingData[categoryKey].items[itemIndex].checked = !shoppingData[categoryKey].items[itemIndex].checked;
+                loadShoppingList();
+                saveData();
+                const item = shoppingData[categoryKey].items[itemIndex];
+                if (item.checked) showNotification(`${item.name} marcado como comprado!`);
+            }
+        }
+
+        function deleteShoppingItem(categoryKey, itemIndex) {
+            if (confirm('Eliminar este produto?')) {
+                shoppingData[categoryKey].items.splice(itemIndex, 1);
+                loadShoppingList();
+                saveData();
+                showNotification('Produto eliminado!');
+            }
+        }
+
+        function deleteCategory(categoryKey) {
+            if (confirm('Eliminar esta categoria completa e todos os produtos?')) {
+                delete shoppingData[categoryKey];
+                loadShoppingList();
+                saveData();
+                showNotification('Categoria eliminada!');
+            }
+        }
+
+        function updateShoppingStats() {
+            let totalItems = 0;
+            let checkedItems = 0;
+            let totalPrice = 0;
+            
+            Object.values(shoppingData).forEach(category => {
+                if (category.items) {
+                    category.items.forEach(item => {
+                        totalItems++;
+                        if (item.checked) checkedItems++;
+                        totalPrice += item.price || 0;
+                    });
+                }
+            });
+            
+            document.getElementById('totalItems').textContent = totalItems;
+            document.getElementById('checkedItems').textContent = checkedItems;
+            document.getElementById('totalPrice').textContent = `€${totalPrice.toFixed(2)}`;
+        }
+
+        function loadWaterTracker() {
+            const container = document.getElementById('waterCups');
+            container.innerHTML = '';
+            
+            for (let i = 0; i < 8; i++) {
+                const cup = document.createElement('div');
+                cup.className = `water-cup ${i < waterCount ? 'filled' : ''}`;
+                cup.innerHTML = i < waterCount ? '💧' : '';
+                cup.onclick = () => setWaterCount(i + 1);
+                container.appendChild(cup);
+            }
+        }
+
+        function setWaterCount(count) {
+            waterCount = count;
+            loadWaterTracker();
+            saveData();
+            if (count === 8) {
+                showNotification('Parabéns! Meta de hidratação alcançada!');
+            }
+        }
+
+        function updateProgress() {
+            let totalMeals = 0;
+            Object.values(mealData).forEach(dayMeals => {
+                totalMeals += dayMeals.length;
+            });
+            
+            const categoriesCount = Object.keys(shoppingData).length;
+            
+            let totalBudget = 0;
+            Object.values(shoppingData).forEach(category => {
+                if (category.items) {
+                    category.items.forEach(item => {
+                        totalBudget += item.price || 0;
+                    });
+                }
+            });
+            
+            const avgMealPrice = totalBudget / 7;
+            
+            document.getElementById('totalMeals').textContent = totalMeals;
+            document.getElementById('totalBudget').textContent = `€${totalBudget.toFixed(2)}`;
+            document.getElementById('categoriesCount').textContent = categoriesCount;
+            document.getElementById('avgMealPrice').textContent = `€${avgMealPrice.toFixed(2)}`;
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 3000);
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem('zardo_meals', JSON.stringify(mealData));
+                localStorage.setItem('zardo_shopping', JSON.stringify(shoppingData));
+                localStorage.setItem('zardo_water', waterCount.toString());
+            } catch (e) {
+                console.error('Could not save data to localStorage:', e);
+                showNotification('Erro ao guardar dados', 'error');
+            }
+        }
+
+        function loadSavedData() {
+            try {
+                const savedMeals = localStorage.getItem('zardo_meals');
+                const savedShopping = localStorage.getItem('zardo_shopping');
+                const savedWater = localStorage.getItem('zardo_water');
+                
+                if (savedMeals) {
+                    const loadedMeals = JSON.parse(savedMeals);
+                    mealData = {
+                        segunda: loadedMeals.segunda || [],
+                        terca: loadedMeals.terca || [],
+                        quarta: loadedMeals.quarta || [],
+                        quinta: loadedMeals.quinta || [],
+                        sexta: loadedMeals.sexta || []
+                    };
+                }
+                
+                if (savedShopping) {
+                    shoppingData = JSON.parse(savedShopping);
+                }
+                
+                if (savedWater) {
+                    waterCount = parseInt(savedWater) || 0;
+                }
+            } catch (e) {
+                console.error('Could not load data from localStorage:', e);
+                showNotification('Erro ao carregar dados guardados', 'warning');
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case '1': e.preventDefault(); showTab('menu'); break;
+                    case '2': e.preventDefault(); showTab('shopping'); break;
+                    case '3': e.preventDefault(); showTab('progress'); break;
+                    case '4': e.preventDefault(); showTab('tips'); break;
+                    case 's': e.preventDefault(); saveData(); showNotification('Dados guardados!'); break;
+                }
+            }
+        });
+
+        setInterval(() => { saveData(); }, 30000);
+        window.addEventListener('beforeunload', () => { saveData(); });
+    </script>
+</body>
+</html>
